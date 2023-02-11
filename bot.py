@@ -2,6 +2,8 @@
 
 import discord, os
 from dotenv import load_dotenv
+from discord.ext import tasks, commands
+import random, asyncio
 
 # Assign "TOKEN" constant to API token stored in a .env file
 load_dotenv()
@@ -13,6 +15,7 @@ bot = discord.Client(intents=discord.Intents.all())
 @bot.event
 async def on_ready():
     print(f"{bot.user} is ready for use")
+    await roles_intro_reminder.start()
 
 # Get guild ID of every server joined
 
@@ -23,7 +26,7 @@ async def on_ready():
 async def on_voice_state_update(member, before, after):
     
     # Assigns "guild" variable to the server ID with the get_guild method. This makes it usable later, since the ID can't be directly referenced
-    guild = bot.get_guild(1064736630319108156)
+    guild = bot.get_guild(1073254437650432041)
 
     # Assigns "category" variable to the "Voice Channels" category in Discord. This allows later use too
     category = discord.utils.get(guild.categories, name = "Create your own channel!")
@@ -53,6 +56,13 @@ async def on_voice_state_update(member, before, after):
                 pass
     except (ValueError, AttributeError):
         pass
+
+
+@tasks.loop(hours=2)
+async def roles_intro_reminder():
+    channel = bot.get_channel(1073254439059730509)
+    await channel.send("Remember to select roles from #roles, as well as introduce yourself in the #introductions channel! This will help others get to know you further!")
+
 
 # Runs the bot, takes the token as input to verify
 bot.run(TOKEN)
